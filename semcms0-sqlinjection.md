@@ -1,4 +1,4 @@
-![image](https://github.com/gatsby2003/Semcms/assets/135791683/aac56692-1a2c-4ea7-9739-07f646ca00d8)![image](https://github.com/gatsby2003/Semcms/assets/135791683/310e11d3-049f-446f-b9b8-f7459e5e6937)**The Semcm foreign trade website management system has locate() SQL injection**
+**The Semcm foreign trade website management system has locate() SQL injection**
 
 **Vulnerability Overview: The Semcms foreign trade website management system has blind injection of the locate() function, which allows attackers to obtain sensitive database information through this vulnerability**
 
