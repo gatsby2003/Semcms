@@ -236,6 +236,9 @@ At this point, all results have been returned
 
 We checked the MySQL monitoring and successfully imported the payload.
 
+![image](https://github.com/gatsby2003/Semcms/assets/135791683/7ec9d277-bfa3-47b2-878a-9bf4a4ecf324)
+
+
 Compare before and after using Payload
 
 Payload not used, searchml=-1, condition judgment invalid
