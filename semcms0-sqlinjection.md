@@ -7,7 +7,9 @@
 **Affected version: PHP version of V4.8 (currently the latest)**
 
 **Impact plugin: backend management interface ->comprehensive management module ->user management department ->editing**
-**Source code download address: SemCms PHP, ASP version of foreign trade website [Multilingual] Free source code download - SemCms foreign trade website management system (sem cms. com)**
+
+Source code download address:  http://www.sem-cms.com/xiazai.html
+
 
 **FOFA Space Surveying: app="SEMCMS"**
 
