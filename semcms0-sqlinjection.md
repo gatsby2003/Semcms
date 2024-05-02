@@ -6,7 +6,7 @@
 
 **Affected version: PHP version of V4.8 (currently the latest)**
 
-**Impact plugin: backend management interface ->comprehensive management module ->user management department ->editing**
+**Impact plugin: Backend management interface ->Comprehensive management module ->Product management ->Search**
 
 Source code download address:  http://www.sem-cms.com/xiazai.html
 
