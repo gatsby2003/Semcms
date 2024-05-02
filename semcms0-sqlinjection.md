@@ -1,4 +1,4 @@
-**The Semcm foreign trade website management system has locate() SQL injection**
+![image](https://github.com/gatsby2003/Semcms/assets/135791683/aac56692-1a2c-4ea7-9739-07f646ca00d8)![image](https://github.com/gatsby2003/Semcms/assets/135791683/310e11d3-049f-446f-b9b8-f7459e5e6937)**The Semcm foreign trade website management system has locate() SQL injection**
 
 **Vulnerability Overview: The Semcms foreign trade website management system has blind injection of the locate() function, which allows attackers to obtain sensitive database information through this vulnerability**
 
@@ -11,7 +11,8 @@
 
 **FOFA Space Surveying: app="SEMCMS"**
 
-![image-20240502192226297](C:\Users\24586\AppData\Roaming\Typora\typora-user-images\image-20240502192226297.png)
+![image](https://github.com/gatsby2003/Semcms/assets/135791683/383136e7-c87a-43bd-8374-7280fe15cda4)
+
 
 1、 Code audit process:
 
@@ -20,16 +21,20 @@
 In the include directory of the project source code, there is a contorl. PHP file. When searching for the input_check_sql function in the file, you will find that it is a global SQL query string filtering function that uses regularization to match a series of commonly used characters in SQL statements, preg_match ('select | and | insert |=|% |<| between | update | \ '| \ * | union | intro | load_file | outfile/i', $sqlstr);
 Select, and, insert,%,=,<, between, update, *, union, into, ', etc. are all filtered, and all SQL query statement strings will be passed as parameters to the $str variable before being called by the verify_str() function. When the user inputs, the verify_str() inner layer calls the input_check_sql() function for verification, which is like a global SQL statement validator.
 
-![image-20240502192330247](C:\Users\24586\AppData\Roaming\Typora\typora-user-images\image-20240502192330247.png)
+![image](https://github.com/gatsby2003/Semcms/assets/135791683/f82d1ac7-1324-4f9a-81ac-52a3e4104a5c)
+
 
 2. I have previously audited the source code, and my previous approach was to use the data content returned by the database to the page rendering as disabled "=", combined with regularization and related functions to guess the database name and length. The difference in approach here is that I will first search for the locate() function to see if the parameters in the locate() function have been filtered for blind injection.
   Search globally for locate() in the project file
 
-  ![image-20240502192353048](C:\Users\24586\AppData\Roaming\Typora\typora-user-images\image-20240502192353048.png)
+ ![image](https://github.com/gatsby2003/Semcms/assets/135791683/4bd6dc4f-5e5b-4828-91b9-bede522040e8)
+
 
 3. Go to the project filepath  /include/function.php
 
-![image-20240502192421935](C:\Users\24586\AppData\Roaming\Typora\typora-user-images\image-20240502192421935.png)
+
+![image](https://github.com/gatsby2003/Semcms/assets/135791683/807289fa-b369-4e6c-9b7d-a327e33d3c4f)
+
 
 The prolmid() function in this file receives $ID and $db_conn and performs an SQL query, and the $ID is directly concatenated into the locate() function.
 
@@ -52,15 +57,18 @@ The prolmid() function in this file receives $ID and $db_conn and performs an SQ
 
 $db_conn is a connection pool, so don't worry. Let's focus on whether the parameter $ID is controllable and look for the function points that call the prommid() function.
 
-![image-20240502192532563](C:\Users\24586\AppData\Roaming\Typora\typora-user-images\image-20240502192532563.png)
+![image](https://github.com/gatsby2003/Semcms/assets/135791683/2f71a99a-dda0-49ee-81c9-3c252e0656b4)
+
 
 It can be found that the function point for calling this function is located in/admin/SEMCMS-Products.php
 
-![image-20240502192553265](C:\Users\24586\AppData\Roaming\Typora\typora-user-images\image-20240502192553265.png)
+![image](https://github.com/gatsby2003/Semcms/assets/135791683/7f73fa21-040c-42ad-bf74-e399a7b855bd)
+
 
 Let's take a closer look and we can see that there are four types of situations based on whether the $CatID and $Searchp parameters are empty. All four types of situations call the palmid() function.
 
-![image-20240502192610116](C:\Users\24586\AppData\Roaming\Typora\typora-user-images\image-20240502192610116.png)
+![image](https://github.com/gatsby2003/Semcms/assets/135791683/0e0dd4ff-c684-4cab-ac5c-041abf1e1490)
+
 
 Here, in order to avoid the influence of other parameters, we enter the second logic ->$CatID is not empty, and $Searchp is empty.
 
@@ -79,7 +87,8 @@ Here, in order to avoid the influence of other parameters, we enter the second l
 
 We further track whether $CatID is controllable and the source from which it obtains parameters, and locate where this parameter is assigned an initial value.
 
-![image-20240502192722033](C:\Users\24586\AppData\Roaming\Typora\typora-user-images\image-20240502192722033.png)
+
+![image](https://github.com/gatsby2003/Semcms/assets/135791683/8e41ff35-4436-4527-831a-056e14162529)
 
 
 
@@ -93,7 +102,8 @@ Here, retrieve the request parameter searchml and determine if it is empty. If i
 
 Then we continue to track the parameter to see if it has any relevant parameter filtering, and then pass in the custom getstrip() function for processing.
 
-![image-20240502192849131](C:\Users\24586\AppData\Roaming\Typora\typora-user-images\image-20240502192849131.png)
+![image](https://github.com/gatsby2003/Semcms/assets/135791683/eb9dc141-bc67-4ce2-b0d9-b441f90453fe)
+
 
 Follow up on the getstrip() function, which is located in the project filepath /include/function. php
 
@@ -132,15 +142,18 @@ Follow up on the getstrip() function, which is located in the project filepath /
 
 Here, $CatID is passed in as the third parameter (formal parameter is $flag), and after checking for non emptiness, the explode() function is used to split it into an array and match it with the ID field obtained from the SQL query after filtering. If successful, a lower level query is performed. No other filtering is performed on $CatID here.
 
-![image-20240502192943182](C:\Users\24586\AppData\Roaming\Typora\typora-user-images\image-20240502192943182.png)
+![image](https://github.com/gatsby2003/Semcms/assets/135791683/11dcd4c7-576f-4b6c-b998-e52efcce58a9)
+
 
 Then directly pass in the prolmid() function.
 
-![image-20240502192959442](C:\Users\24586\AppData\Roaming\Typora\typora-user-images\image-20240502192959442.png)
+![image](https://github.com/gatsby2003/Semcms/assets/135791683/741f65db-5b3e-4345-b46f-dc234ade415f)
+
 
 Looking at the included file introduced here, it is found that there is no contorl. PHP, and $CatId is directly concatenated into the locate() function without filtering, which can be obtained by passing parameters through searchml. Therefore, there is SQL injection present.
 
-![image-20240502193021743](C:\Users\24586\AppData\Roaming\Typora\typora-user-images\image-20240502193021743.png)
+![image](https://github.com/gatsby2003/Semcms/assets/135791683/2117d918-ddab-46b8-a27f-93f0e8b0d320)
+
 
 **2、 Verification process**
 
@@ -170,20 +183,24 @@ Upgrade-Insecure-Requests: 1
 searchml=64&search=
 ```
 
-![image-20240502193203592](C:\Users\24586\AppData\Roaming\Typora\typora-user-images\image-20240502193203592.png)
+![image](https://github.com/gatsby2003/Semcms/assets/135791683/a5567538-0238-4aed-8e57-040e11a6d9d6)
+
 
 Enable MySQL monitoring and discover successful execution of SQL statements
 Select ID from sc_categories where LOCATE (', 64,', category_path)>0 and category_open=1.
 
-![image-20240502193221584](C:\Users\24586\AppData\Roaming\Typora\typora-user-images\image-20240502193221584.png)
+![image](https://github.com/gatsby2003/Semcms/assets/135791683/97325c11-5c29-4e51-9d5f-26655805d388)
+
 
 Change searchml to -1 and find no content echo.
 
-![image-20240502193237792](C:\Users\24586\AppData\Roaming\Typora\typora-user-images\image-20240502193237792.png)
+![image](https://github.com/gatsby2003/Semcms/assets/135791683/d626e533-bd74-41bd-803c-88a9c3a7c00b)
+
 
 Analyze SQL statement and return ID=64
 
-![image-20240502193300066](C:\Users\24586\AppData\Roaming\Typora\typora-user-images\image-20240502193300066.png)
+![image](https://github.com/gatsby2003/Semcms/assets/135791683/5313bd4b-7a1f-42e1-9544-506aa6d8c319)
+
 
 There is a constraint in the SQL query LOCATE() function that returns relevant results
 
@@ -197,11 +214,14 @@ LOCATE (', 64,', category_path)>0 must require category_path to contain ', $sear
 Select category_path from sc_categories
 ```
 
-![image-20240502193359406](C:\Users\24586\AppData\Roaming\Typora\typora-user-images\image-20240502193359406.png)
+![image](https://github.com/gatsby2003/Semcms/assets/135791683/b974542f-78bc-4d0c-a129-01fe2e174948)
+
 
 It can be observed that when we searchml=64, the locate() function exactly matches' 0,1,64, 'in the database with' 0,1,64, 'which means' 0,1,64,' contains', 64, ', so it is judged as a valid query with returned data. However, when we previously passed a parameter of -1, there was no data returned because', -1, 'was not matched by category_path.
 
-![image-20240502193423053](C:\Users\24586\AppData\Roaming\Typora\typora-user-images\image-20240502193423053.png)
+![image](https://github.com/gatsby2003/Semcms/assets/135791683/c019bbbf-d1cc-499d-8626-b2efca12d6db)
+
+
 
 We try to incorporate the AND logical symbol so that the previous substring's final result is' 0 ', which matches all results. When our payload is as follows.
 
@@ -211,7 +231,8 @@ We try to incorporate the AND logical symbol so that the previous substring's fi
 
 At this point, all results have been returned
 
-![image-20240502193505467](C:\Users\24586\AppData\Roaming\Typora\typora-user-images\image-20240502193505467.png)
+![image](https://github.com/gatsby2003/Semcms/assets/135791683/5d4d6acf-b13c-45be-9d0a-1f02ee7aed72)
+
 
 We checked the MySQL monitoring and successfully imported the payload.
 
@@ -219,12 +240,14 @@ Compare before and after using Payload
 
 Payload not used, searchml=-1, condition judgment invalid
 
-![image-20240502193555549](C:\Users\24586\AppData\Roaming\Typora\typora-user-images\image-20240502193555549.png)
+![image](https://github.com/gatsby2003/Semcms/assets/135791683/c10bf34c-0939-49a1-abce-50830f21e661)
+
 
 Using payload, searchml=-1 'AND' a '='a, the condition is successfully determined, and the underlying logic is
 0 matches the following string 0, *
 
-![image-20240502193615144](C:\Users\24586\AppData\Roaming\Typora\typora-user-images\image-20240502193615144.png)
+![image](https://github.com/gatsby2003/Semcms/assets/135791683/03e7c3e3-4862-4287-9028-071e5279ceb0)
+
 
 Attempt to construct a closed subquery delay using parentheses.
 
@@ -234,12 +257,14 @@ Attempt to construct a closed subquery delay using parentheses.
 
 Delay sub queries twice.
 
-![image-20240502193701583](C:\Users\24586\AppData\Roaming\Typora\typora-user-images\image-20240502193701583.png)
+![image](https://github.com/gatsby2003/Semcms/assets/135791683/c4ba8882-abfa-45ba-a917-72237238491d)
+
 
 Successfully imported controllable parameters at the database level.
 
-![image-20240502193724111](C:\Users\24586\AppData\Roaming\Typora\typora-user-images\image-20240502193724111.png)
+![image](https://github.com/gatsby2003/Semcms/assets/135791683/9b085907-6308-4679-9924-e57be1951441)
+
 
 Sqlmap validation.
 
-![image-20240502193740203](C:\Users\24586\AppData\Roaming\Typora\typora-user-images\image-20240502193740203.png)
+![image](https://github.com/gatsby2003/Semcms/assets/135791683/2dc27f76-6f11-43b1-b342-49d9163e6b74)
